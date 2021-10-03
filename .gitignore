@@ -6,6 +6,17 @@
 
 dados/
 
+
+
+
+HELP.md
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### VS Code ###
+.vscode/
+
 # Node artifact files
 node_modules/
 dist/
@@ -19,8 +30,8 @@ dist/
 # Log files
 *.log
 
-# Properties
-*.properties
+## Properties
+#*.properties
 
 # Package files
 *.jar
@@ -29,10 +40,20 @@ dist/
 target/
 dist/
 
-# JetBrains IDE
+### JetBrains IDE ###
 .idea/
 out/
 *.iml
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
 
 ### Eclipse ###
 .metadata
@@ -81,5 +102,4 @@ Thumbs.db
 *.mov
 *.wmv
 *.db
-
 

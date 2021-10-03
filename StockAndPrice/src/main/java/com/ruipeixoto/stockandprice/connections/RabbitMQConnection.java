@@ -1,10 +1,7 @@
 package com.ruipeixoto.stockandprice.connections;
 
 import com.ruipeixoto.libraryrabbitmq.constants.RabbitMQConstants;
-import org.springframework.amqp.core.AmqpAdmin;
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.DirectExchange;
-import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,33 +20,36 @@ public class RabbitMQConnection {
     }
 
 
-    private Queue queue(String queueName){
+    private Queue createQueue(String queueName){
         return new Queue(queueName, true, false, false);
     }
 
-    private DirectExchange directExchange(){
+    private DirectExchange createDirectExchange(){
         return new DirectExchange(NAME_EXCHANGE);
     }
 
 
-    private Binding relacionamento(Queue queue, DirectExchange directExchange){
-        return new Binding(
-                queue.getName(),
-                Binding.DestinationType.QUEUE,
-                directExchange.getName(),
-                queue.getName(),
-                null);
+    private Binding createBinding(Queue queue, DirectExchange directExchange){
+        //through constructor
+//        return new Binding(queue.getName(), Binding.DestinationType.QUEUE,
+//                directExchange.getName(), queue.getName(),null);
+
+    //alternatively, through builder:
+        return BindingBuilder
+                .bind(queue)
+                .to(directExchange)
+                .with(queue.getName());
     }
 
     @PostConstruct
-    private void  adiciona(){
-        Queue stockQueue = this.queue(RabbitMQConstants.STOCK_QUEUE);
-        Queue priceQueue = this.queue(RabbitMQConstants.PRICE_QUEUE);
+    private void configureAMQPAdmin(){
+        Queue stockQueue = this.createQueue(RabbitMQConstants.STOCK_QUEUE);
+        Queue priceQueue = this.createQueue(RabbitMQConstants.PRICE_QUEUE);
 
-        DirectExchange directExchange = this.directExchange();
+        DirectExchange directExchange = this.createDirectExchange();
 
-        Binding stockBinding =  relacionamento(stockQueue, directExchange);
-        Binding priceBinding =  relacionamento(priceQueue, directExchange);
+        Binding stockBinding =  createBinding(stockQueue, directExchange);
+        Binding priceBinding =  createBinding(priceQueue, directExchange);
 
         this.amqpAdmin.declareExchange(directExchange);
 
@@ -58,7 +58,6 @@ public class RabbitMQConnection {
 
         this.amqpAdmin.declareBinding(stockBinding);
         this.amqpAdmin.declareBinding(priceBinding);
-
     }
 
 

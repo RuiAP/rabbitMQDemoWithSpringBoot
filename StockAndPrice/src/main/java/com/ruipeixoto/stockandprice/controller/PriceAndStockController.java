@@ -16,23 +16,30 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("products")
 public class PriceAndStockController {
 
-    @Autowired
-    private RabbitMQService rabbitMQService;
+    private final RabbitMQService rabbitMQService;
 
+    @Autowired
+    public PriceAndStockController(RabbitMQService rabbitMQService) {
+        this.rabbitMQService = rabbitMQService;
+    }
 
     @PostMapping("price")
     public ResponseEntity registerPrice(@RequestBody @Validated PriceDTO priceDTO){
-        rabbitMQService.sendPriceMessage(priceDTO);
+        boolean success = rabbitMQService.sendPriceMessage(priceDTO);
 
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return success?
+                new ResponseEntity<>(HttpStatus.CREATED)
+                : new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @PostMapping("stock")
     public ResponseEntity registerStock(@RequestBody @Validated StockDTO stockDTO){
-        rabbitMQService.sendStockMessage(stockDTO);
+        boolean success = rabbitMQService.sendStockMessage(stockDTO);
 
+        return success?
+                new ResponseEntity<>(HttpStatus.CREATED)
+                : new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 
-        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
 
